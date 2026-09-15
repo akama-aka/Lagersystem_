@@ -1,0 +1,8 @@
+<h1>View Transaction</h1>
+<p><b>Amount: </b> <%=transaction.Amount%></p>
+<p><b>Description: </b><%=transaction.Description%></p>
+<p><b>Category: </b><%=transaction.category.Name%></p>
+<p><b>Date: </b><%=transaction.createdAt%></p>
+
+<button class="btn btn-primary" onclick="location.href='/<%=transaction.Id%>/edit'">Edit</button>
+<button class="btn btn-danger" onclick="location.href='/<%=transaction.Id%>/delete'">Delete</button>

@@ -1,0 +1,24 @@
+<h1>Categories</h1>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">Colour</th>
+            <th scope="col">Date</th>
+            <th scope="col"><button class="btn btn-primary" onclick="location.href='/new'"><i class="fa-solid fa-plus"></i></button></th>
+        </tr>
+    </thead>
+    <tbody>
+        <% for(const category of categories) { %>
+            <tr>
+                <th scope="row"><%= category.Id %></th>
+                <td><%=category.Name%></th>
+                <td><%=category.Colour%></th>
+                <td><%=category.createdAt%></td>
+                <td><button class="btn btn-primary" onclick="location.href='/categories/<%=category.Id%>'"><i class="fa-solid fa-eye"></i></button></td>
+            </tr>
+        <%}%>
+    </tbody>
+</table>

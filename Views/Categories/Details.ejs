@@ -1,0 +1,6 @@
+<h1>Viewing <%=category.Name%></h1>
+<p><b>Name:</b> <%=category.Name%></p>
+<p><b>Colour:</b> <%=category.Colour%></p>
+<p><b>Date:</b> <%=category.createdAt%></p>
+<button class="btn btn-primary" onclick="location.href='/categories/<%=category.Id%>/edit'">Edit</button>
+<button class="btn btn-danger" onclick="location.href='/categories/<%=category.Id%>/delete'">Delete</button>

@@ -1,0 +1,23 @@
+<h1>Create new Transaction</h1>
+<form method="post">
+    <div class="mb-3">
+        <label for="createAmount" class="form-label">Amount</label>
+        <input class="form-control" type="number" name="createAmount" id="createAmount">
+    </div>
+    <div class="mb-3">
+        <label for="createDescription" class="form-label">Description</label>
+        <input class="form-control" type="text" name="createDescription" id="createDescription">
+    </div>
+    <select name="createCategory" class="form-select" aria-label="Default select create">
+        <option selected disabled>--- Select Transaction Category ---</option>
+        <% for(const category of categories) {%>
+            <option value="<%=category.Id%>"><%=category.Name%></option>
+        <%}%>
+    </select>
+    <select name="createType" class="form-select" aria-label="Default select create">
+        <option selected disabled>--- Select Transaction Type ---</option>
+        <option value="1">In</option>
+        <option value="0">Out</option>
+    </select>
+    <button class="btn btn-primary" type="submit">Create</button>
+</form>

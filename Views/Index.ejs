@@ -1,0 +1,86 @@
+<h1>Kassabuch</h1>
+<div class="container px-4 text-center">
+    <div class="row gx-5 bg-body-secondary">
+        <div class="col ">
+            <div class="p-2">
+                <h2>Balance</h2>
+                <h4><code><%=account.Balance%></code></p>
+            </div>
+            <div class="p-2">
+                <h2>Daily Stats</h2>
+                <h4><code><%=statsDaily[0].totalAmount%></code></h4>
+            </div>
+            <div class="p-2">
+                <h2>Weekly Stats</h2>
+                <h4><code><%=statsWeekly[0].totalAmount%></code></h4>
+            </div>
+            <div class="p-2">
+                <h2>Monthly Stats</h2>
+                <h4><code><%=statsMonthly[0].totalAmount%></code></h4>
+            </div>
+        </div>
+    </div>
+</div>
+<table class="table">
+    <thead>
+        <tr>
+            <th scope="col">#</th>
+            <% if(orderBy == "Amount") {
+                if(orderDir == "asc") {%>
+                    <th scope="col">Amount <button class="btn btn-primary btn-sm" onclick="location.href='/?orderBy=Amount&orderDir=desc'"><i class="fa-solid fa-sort-down"></i></button></th>
+                <%} else {%>
+                    <th scope="col">Amount <button class="btn btn-primary btn-sm" onclick="location.href='/?orderBy=Amount&orderDir=asc'"><i class="fa-solid fa-sort-up"></i></button></th>
+                <%}
+            } else {%>
+                <th scope="col">Amount <button class="btn btn-primary btn-sm" onclick="location.href='/?orderBy=Amount&orderDir=desc'"><i class="fa-solid fa-sort-down"></i></button></th>
+            <%}%>
+            <th scope="col">Description</th>
+            <%if(orderBy == "Categories" && orderDir == "asc") {%>
+                <th scope="col">Category <button class="btn btn-primary btn-sm" onclick="location.href='/?orderBy=Categories&orderDir=desc'"><i class="fa-solid fa-sort-down"></i></button></th>
+            <%} else {%>
+                <th scope="col">Category <button class="btn btn-primary btn-sm" onclick="location.href='/?orderBy=Categories&orderDir=asc'"><i class="fa-solid fa-sort-up"></i></button></th>
+            <%}%>
+            <%if(orderBy == "createdAt" && orderDir == "asc") {%>
+                <th scope="col">Date <button class="btn btn-primary btn-sm" onclick="location.href='/?orderBy=createdAt&orderDir=desc'"><i class="fa-solid fa-sort-down"></i></button></th>
+            <%} else {%>
+                <th scope="col">Date <button class="btn btn-primary btn-sm" onclick="location.href='/?orderBy=createdAt&orderDir=asc'"><i class="fa-solid fa-sort-up"></i></button></th>
+            <%}%>
+            <th scope="col"><button class="btn btn-primary" onclick="location.href='/new'"><i class="fa-solid fa-plus"></i></button></th>
+        </tr>
+    </thead>
+    <tbody>
+        <% for (const transaction of transactions) { %>
+            <tr>
+                <th scope="row"><%= transaction.Id %></th>
+                <td><%=transaction.Amount%></th>
+                <td><%=transaction.Description%></th>
+                <td><span class="badge" style="background-color: <%=transaction.category.Colour%>;"><%=transaction.category.Name%></span></td>
+                <td><%=transaction.createdAt%></td>
+                <td><button class="btn btn-primary" onclick="location.href='/<%=transaction.Id%>'"><i class="fa-solid fa-eye"></i></button></td>
+            </tr>
+        <% } %>
+    </tbody>
+</table>
+
+<script>
+    /**document.addEventListener("DOMContentLoaded", pageContent => {
+        const queryStrings = Object.fromEntries(new URLSearchParams(window.location.search).entries());
+        console.log(queryStrings)
+        switch(queryStrings.orderBy) {
+            case "Amount":
+                if(queryStrings.orderDir == "desc") {
+                    document.getElementById("btnOrderByAmount").onclick("location.href='/?orderBy=Amount&orderDir=asc'");
+                    console.log(document.getElementById("btnOrderByAmount").getElementsByTagName("i"))
+                    document.getElementById("btnOrderByAmount").getElementsByTagName("i").classList.add("fa-solid fa-sort-up")
+                } else {
+                    document.getElementById("btnOrderByAmount").onclick = "location.href='/?orderBy=Amount&orderDir=desc'";
+                    console.log(document.getElementById("btnOrderByAmount").getElementsByTagName("i"))
+                    document.getElementById("btnOrderByAmount").getElementsByTagName("i").classList.add("fa-solid fa-sort-down")
+                }
+                break;
+        }
+    })**/
+    function orderEvent(orderBy, orderDir) {
+
+    }
+</script>
