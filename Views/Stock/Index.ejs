@@ -1,0 +1,30 @@
+<h1>Bestand</h1>
+<p class="text-muted">Aktueller Lagerbestand je Artikel inkl. gewichtetem Durchschnittspreis und Gesamtwert.</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Artikelnummer</th>
+            <th>Name</th>
+            <th>Menge</th>
+            <th>Ø Einkaufspreis</th>
+            <th>Gesamtwert</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% for(const item of stock) { %>
+            <tr>
+                <td><%=item.ArticleNumber%></td>
+                <td><%=item.Name%></td>
+                <td><%=item.Quantity%></td>
+                <td><%=item.AveragePrice.toFixed(2)%></td>
+                <td><%=item.TotalValue.toFixed(2)%></td>
+            </tr>
+        <% } %>
+    </tbody>
+    <tfoot>
+        <tr>
+            <th colspan="4">Gesamt</th>
+            <th><%= stock.reduce((sum,item) => sum + item.TotalValue, 0).toFixed(2) %></th>
+        </tr>
+    </tfoot>
+</table>

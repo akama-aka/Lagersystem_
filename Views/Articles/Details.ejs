@@ -1,0 +1,31 @@
+<h1>Artikel <%=article.ArticleNumber%> - <%=article.Name%></h1>
+<p><b>Artikelnummer:</b> <%=article.ArticleNumber%></p>
+<p><b>Name:</b> <%=article.Name%></p>
+<p><b>Beschreibung:</b> <%=article.Description%></p>
+
+<button class="btn btn-primary" onclick="location.href='/articles/<%=article.Id%>/edit'">Bearbeiten</button>
+<button class="btn btn-danger" onclick="location.href='/articles/<%=article.Id%>/delete'">Löschen</button>
+
+<h3 class="mt-4">Buchungshistorie</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Datum</th>
+            <th>Typ</th>
+            <th>Menge</th>
+            <th>Preis</th>
+            <th>Beschreibung</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% for(const booking of bookings) { %>
+            <tr>
+                <td><%=booking.createdAt%></td>
+                <td><span class="badge <%=booking.Type ? 'bg-success' : 'bg-danger'%>"><%=booking.Type ? "Zugang" : "Abgang"%></span></td>
+                <td><%=booking.Quantity%></td>
+                <td><%=booking.Price%></td>
+                <td><%=booking.Description%></td>
+            </tr>
+        <% } %>
+    </tbody>
+</table>

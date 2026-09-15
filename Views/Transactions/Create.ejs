@@ -1,23 +1,37 @@
-<h1>Create new Transaction</h1>
+<h1>Neue Buchung</h1>
 <form method="post">
     <div class="mb-3">
-        <label for="createAmount" class="form-label">Amount</label>
-        <input class="form-control" type="number" name="createAmount" id="createAmount">
+        <label for="createArticle" class="form-label">Artikel</label>
+        <select name="createArticle" id="createArticle" class="form-select" required>
+            <option value="" selected disabled>--- Artikel wählen ---</option>
+            <% for(const article of articles) {%>
+                <option value="<%=article.Id%>"><%=article.ArticleNumber%> - <%=article.Name%></option>
+            <%}%>
+        </select>
     </div>
     <div class="mb-3">
-        <label for="createDescription" class="form-label">Description</label>
+        <label for="createType" class="form-label">Buchungsart</label>
+        <select name="createType" id="createType" class="form-select" required>
+            <option value="" selected disabled>--- Buchungsart wählen ---</option>
+            <option value="1">Zugang (Wareneingang)</option>
+            <option value="0">Abgang (Warenausgang)</option>
+        </select>
+    </div>
+    <div class="mb-3">
+        <label for="createQuantity" class="form-label">Menge</label>
+        <input class="form-control" type="number" step="1" min="0" name="createQuantity" id="createQuantity" required>
+    </div>
+    <div class="mb-3">
+        <label for="createPrice" class="form-label">Preis (Einkaufspreis)</label>
+        <input class="form-control" type="number" step="0.01" min="0" name="createPrice" id="createPrice" required>
+    </div>
+    <div class="mb-3">
+        <label for="createDate" class="form-label">Datum</label>
+        <input class="form-control" type="date" name="createDate" id="createDate" value="<%= new Date().toISOString().slice(0,10) %>">
+    </div>
+    <div class="mb-3">
+        <label for="createDescription" class="form-label">Beschreibung</label>
         <input class="form-control" type="text" name="createDescription" id="createDescription">
     </div>
-    <select name="createCategory" class="form-select" aria-label="Default select create">
-        <option selected disabled>--- Select Transaction Category ---</option>
-        <% for(const category of categories) {%>
-            <option value="<%=category.Id%>"><%=category.Name%></option>
-        <%}%>
-    </select>
-    <select name="createType" class="form-select" aria-label="Default select create">
-        <option selected disabled>--- Select Transaction Type ---</option>
-        <option value="1">In</option>
-        <option value="0">Out</option>
-    </select>
-    <button class="btn btn-primary" type="submit">Create</button>
+    <button class="btn btn-primary" type="submit">Anlegen</button>
 </form>

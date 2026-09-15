@@ -1,0 +1,16 @@
+<h1>Artikel bearbeiten</h1>
+<form method="post">
+    <div class="mb-3">
+        <label for="articleNumber" class="form-label">Artikelnummer</label>
+        <input class="form-control" type="text" name="articleNumber" id="articleNumber" value="<%=article.ArticleNumber%>" required>
+    </div>
+    <div class="mb-3">
+        <label for="articleName" class="form-label">Artikelname</label>
+        <input class="form-control" type="text" name="articleName" id="articleName" value="<%=article.Name%>" required>
+    </div>
+    <div class="mb-3">
+        <label for="articleDescription" class="form-label">Beschreibung</label>
+        <textarea class="form-control" name="articleDescription" id="articleDescription"><%=article.Description%></textarea>
+    </div>
+    <button class="btn btn-primary" type="submit">Speichern</button>
+</form>

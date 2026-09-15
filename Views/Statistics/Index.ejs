@@ -1,0 +1,24 @@
+<h1>Statistik</h1>
+<h3>Top 3 Artikel nach Lagerwert</h3>
+<table class="table">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Artikelnummer</th>
+            <th>Name</th>
+            <th>Menge</th>
+            <th>Gesamtwert</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% top3.forEach((item, index) => { %>
+            <tr>
+                <td><%= index + 1 %></td>
+                <td><%=item.ArticleNumber%></td>
+                <td><%=item.Name%></td>
+                <td><%=item.Quantity%></td>
+                <td><%=item.TotalValue.toFixed(2)%></td>
+            </tr>
+        <% }) %>
+    </tbody>
+</table>

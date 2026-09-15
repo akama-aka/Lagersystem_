@@ -1,7 +1,8 @@
 require('dotenv').config();
 const {join} = require('node:path')
 const fastify = require('fastify');
-const { Transactions, Accounts, Categories, sequelize } = require('./Features/db');
+const { Transactions, Articles } = require('./Features/db');
+const { getStock } = require('./Features/inventory');
 const server = new fastify({
     logger:true
 });
@@ -24,92 +25,62 @@ server.get('/', async (req, rep) => {
     // Order By Filter
     filterRule.push(req.query.orderBy || "createdAt", req.query.orderDir || "ASC")
     const transactions = await Transactions.findAll({order: [filterRule]});
-    // Statistics
-    const statsDaily = await Transactions.findAll({
-        attributes: [
-            [sequelize.literal(`DATE("createdAt")`), 'date'],
-            [sequelize.fn('COUNT', sequelize.col('Id')),'count'],
-            [sequelize.fn('SUM', sequelize.col('Amount')), 'totalAmount']
-        ],
-        group: [sequelize.literal(`DATE("createdAt")`)],
-        raw:true
-    })
-    const statsWeekly = await Transactions.findAll({
-        attributes: [
-            [sequelize.literal(`strftime('%Y-%W', "createdAt")`), 'week'],
-            [sequelize.fn('COUNT', sequelize.col('Id')), 'count'],
-            [sequelize.fn('SUM', sequelize.col('Amount')), 'totalAmount']
-        ],
-        group: [sequelize.literal(`strftime('%%Y-%%W', "createdAt")`)],
-        raw: true
-    })
-    const statsMonthly = await Transactions.findAll({
-        attributes: [
-            [sequelize.literal(`strftime('%Y-%m', "createdAt")`), 'month'],
-            [sequelize.fn('COUNT', sequelize.col('Id')), 'count'],
-            [sequelize.fn('SUM', sequelize.col('Amount')), 'totalAmount']
-        ],
-        group: [sequelize.literal(`strftime('%Y-%m', "createdAt")`)],
-        raw: true
-    })
-    const account = await Accounts.findOne({where: {Id: 1}})
     for(const transaction of transactions) {
-        const category = await Categories.findOne({where: {Id: transaction.Category}});
-        transaction.category = category;
+        const article = await Articles.findOne({where: {Id: transaction.Article}});
+        transaction.article = article;
     }
-    return rep.view('Index', {transactions: transactions, account: account, orderBy: req.query.orderBy || "createdAt", orderDir: req.query?.orderDir || "asc", statsDaily: statsDaily, statsWeekly: statsWeekly, statsMonthly: statsMonthly}) 
+    return rep.view('Index', {transactions: transactions, orderBy: req.query.orderBy || "createdAt", orderDir: req.query?.orderDir || "asc"})
 })
 
 server.get('/new', async (req, rep) => {
-    const categories =await Categories.findAll();
-    return rep.view('Transactions/Create', {categories: categories})
+    const articles = await Articles.findAll();
+    return rep.view('Transactions/Create', {articles: articles})
 })
 
 server.post('/new', async (req, rep) => {
     const payload = {
-        Amount: req.body.createAmount,
+        Quantity: req.body.createQuantity,
+        Price: req.body.createPrice,
         Description: req.body.createDescription,
-        Category: req.body.createCategory,
+        Article: req.body.createArticle,
         Type: req.body.createType
     }
+    if(req.body.createDate) {
+        payload.createdAt = new Date(req.body.createDate);
+    }
     await Transactions.create(payload);
-    if(payload.Type == 1)
-        await Accounts.increment({Balance: payload.Amount}, {where: {Id: 1}})
-    else
-        await Accounts.increment({Balance: -payload.Amount}, {where: {Id: 1}})
     return rep.redirect('/')
 })
 
 server.get('/:id', async (req, rep) => {
     let transaction = await Transactions.findOne({where: {Id: req.params.id}})
-    if(transaction.Category) {
-        const category = await Categories.findOne({where: {Id: transaction.Category }});
-        transaction.category = category;
-
+    if(transaction.Article) {
+        const article = await Articles.findOne({where: {Id: transaction.Article }});
+        transaction.article = article;
     }
     return rep.view('Transactions/Index', {transaction: transaction})
 })
 server.get('/:id/edit', async (req, rep) => {
     let transaction = await Transactions.findOne({where: {Id: req.params.id}})
-    const categories =await Categories.findAll();
-    if(transaction.Category) {
-        const category = await Categories.findOne({where: {Id: transaction.Category }});
-        transaction.category = category;
+    const articles = await Articles.findAll();
+    if(transaction.Article) {
+        const article = await Articles.findOne({where: {Id: transaction.Article }});
+        transaction.article = article;
     }
-    return rep.view('Transactions/Edit', {transaction: transaction, categories: categories})
+    return rep.view('Transactions/Edit', {transaction: transaction, articles: articles})
 })
 server.post('/:id/edit', async (req, rep) => {
     let transaction = await Transactions.findOne({where: {Id: req.params.id}})
 
-    if(transaction.Category) {
-        const category = await Categories.findOne({where: {Id: transaction.Category }});
-        transaction.category = category;
-    }
     const payload = {
-        Amount: req.body.createAmount,
+        Quantity: req.body.createQuantity,
+        Price: req.body.createPrice,
         Description: req.body.createDescription,
-        Category: req.body.createCategory,
+        Article: req.body.createArticle,
         Type: req.body.createType
+    }
+    if(req.body.createDate) {
+        payload.createdAt = new Date(req.body.createDate);
     }
     await transaction.update(payload, {where: {Id: req.params.id}})
     return rep.redirect('/')
@@ -123,33 +94,66 @@ server.get('/:id/delete', async (req, rep) => {
 })
 
 
-// Categories
+// Artikel (Übung 2, Punkte 1-3: hinzufügen, bearbeiten, löschen)
 
-server.get('/categories', async (req, rep) => {
-    const categories = await Categories.findAll();
-    return rep.view('Categories/Index', {categories: categories})
+server.get('/articles', async (req, rep) => {
+    const articles = await Articles.findAll();
+    return rep.view('Articles/Index', {articles: articles})
 })
-server.get('/categories/:id', async (req, rep) => {
-    const category = await Categories.findOne({where:{Id: req.params.id}});
-    return rep.view('Categories/Details', {category: category})
+server.get('/articles/new', async (req, rep) => {
+    return rep.view('Articles/Create')
 })
-server.get('/categories/:id/edit', async (req, rep) => {
-    const category = await Categories.findOne({where: {Id: req.params.id}})
-    return rep.view('Categories/Edit', {category: category})
-})
-server.post('/categories/:id/edit', async (req, rep) => {
-    const payload= {
-        Name: req.body.categoryName,
-        Colour: req.body.categoryColour
+server.post('/articles/new', async (req, rep) => {
+    const payload = {
+        ArticleNumber: req.body.articleNumber,
+        Name: req.body.articleName,
+        Description: req.body.articleDescription
     }
-    await Categories.update(payload, {where:{Id: req.params.id}});
-    return rep.redirect('/categories')
+    await Articles.create(payload);
+    return rep.redirect('/articles')
 })
-server.get('/categories/:id/delete', async (req, rep) => {
+server.get('/articles/:id', async (req, rep) => {
+    const article = await Articles.findOne({where:{Id: req.params.id}});
+    const bookings = await Transactions.findAll({where: {Article: req.params.id}, order: [["createdAt", "DESC"]]});
+    return rep.view('Articles/Details', {article: article, bookings: bookings})
+})
+server.get('/articles/:id/edit', async (req, rep) => {
+    const article = await Articles.findOne({where: {Id: req.params.id}})
+    return rep.view('Articles/Edit', {article: article})
+})
+server.post('/articles/:id/edit', async (req, rep) => {
+    const payload= {
+        ArticleNumber: req.body.articleNumber,
+        Name: req.body.articleName,
+        Description: req.body.articleDescription
+    }
+    await Articles.update(payload, {where:{Id: req.params.id}});
+    return rep.redirect('/articles')
+})
+server.get('/articles/:id/delete', async (req, rep) => {
     if(!req.query.confirmed)
-        return rep.view('Categories/Delete');
-    await Categories.destroy({where: {Id: req.params.id}})
-    return rep.redirect('/');
+        return rep.view('Articles/Delete');
+    await Articles.destroy({where: {Id: req.params.id}})
+    return rep.redirect('/articles');
+})
+
+// Bestand anzeigen (Übung 2, Punkt 4) inkl. gewichtetem Durchschnittspreis (Punkt 9)
+server.get('/stock', async (req, rep) => {
+    const stock = await getStock();
+    return rep.view('Stock/Index', {stock: stock})
+})
+
+// Bericht generieren (Übung 2, Punkt 6)
+server.get('/report', async (req, rep) => {
+    const stock = await getStock();
+    return rep.view('Report/Index', {stock: stock, generatedAt: new Date()})
+})
+
+// Statistik: Top 3 Artikel nach Lagerwert (Übung 2, Punkt 7)
+server.get('/statistics', async (req, rep) => {
+    const stock = await getStock();
+    const top3 = [...stock].sort((a,b) => b.TotalValue - a.TotalValue).slice(0,3);
+    return rep.view('Statistics/Index', {top3: top3})
 })
 
 server.listen({host: "127.0.0.1", port: 8080}).then(() => {

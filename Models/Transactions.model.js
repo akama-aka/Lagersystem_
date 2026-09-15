@@ -1,6 +1,7 @@
 const { DataTypes, Deferrable } = require("sequelize");
 const { sequelize } = require("../Features/db");
 
+// Lagerbuchungen: jede Zu- oder Abbuchung eines Artikels (Übung 2, Punkt 5 + 8)
 module.exports = (sequelize) => {
     const Transactions = sequelize.define("Transactions", {
         Id: {
@@ -8,7 +9,12 @@ module.exports = (sequelize) => {
             primaryKey: true,
             autoIncrement: true
         },
-        Amount: {
+        Quantity: {
+            type: DataTypes.DECIMAL,
+            allowNull: false,
+            defaultValue: 0.00
+        },
+        Price: {
             type: DataTypes.DECIMAL,
             allowNull: false,
             defaultValue: 0.00
@@ -17,20 +23,19 @@ module.exports = (sequelize) => {
             type: DataTypes.STRING,
             allowNull: true
         },
-        Category: {
+        Article: {
             type: DataTypes.INTEGER,
             allowNull: true,
-            defaultValue: 1,
             references: {
                 type: DataTypes.INTEGER,
-                model: 'Categories',
+                model: 'Articles',
                 key: 'Id',
                 deferrable: Deferrable.INITIALLY_IMMEDIATE
             }
         },
         Type: {
             type: DataTypes.BOOLEAN,
-            allowNull: false
+            allowNull: false // 1 = Zugang (Wareneingang), 0 = Abgang (Warenausgang)
         }
     })
     return Transactions
